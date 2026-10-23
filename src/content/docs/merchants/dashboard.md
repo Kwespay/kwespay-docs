@@ -24,6 +24,8 @@ The merchant dashboard is where a business sets up everything the API reads when
 
 **Payment links.** Shareable checkout pages that need no code. See [Payment links](/merchants/payment-links/).
 
+**Payments from other chains.** Let customers pay with XLM or BTC while you receive USDC on Base. See [Pay from any chain](/guides/pay-from-any-chain/).
+
 **API keys.** Create keys for your integrations, optionally limited to certain networks and tokens, and deactivate keys you no longer use. See [Authentication](/api/authentication/).
 
 **Payments.** A history of the merchant's transactions with their status, amount, token, network and transaction hash. Use it with the transaction reference to reconcile orders.

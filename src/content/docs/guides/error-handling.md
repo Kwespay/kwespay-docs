@@ -2,7 +2,7 @@
 title: Error handling
 description: How KwesPay reports failures in the SDK, the widget and the GraphQL API, and how to recover from expired quotes, wallet rejections, network mismatches and API errors.
 sidebar:
-  order: 6
+  order: 7
 ---
 
 Failures come from three places: the KwesPay API, the customer's wallet and the chain. The SDK turns all of them into a `KwesPayError` with a `code`.

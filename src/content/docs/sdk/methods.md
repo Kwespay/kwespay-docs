@@ -15,6 +15,7 @@ All methods are `async` and throw [`KwesPayError`](/sdk/errors/) on failure unle
 | [`validateKey()`](#validatekey) | `validateAccessKey` | No |
 | [`getMerchantConfig()`](#getmerchantconfig) | `getVendor`, `paymentNetworks` | No |
 | [`getNetworks()`](#getnetworks) | `paymentNetworks` | No |
+| [`checkoutFromAnotherAsset()`](#pay-from-another-asset) | `createQuote`, `crossChainOptions`, `createCrossChainPayment`, `paymentRoute` | Optional |
 | [`getQuote()`](#getquote) | `createQuote` | No |
 | [`quote()`](#quote) | `createQuote`, `createTransaction` | No |
 | [`pay()`](#pay) | Wallet, contract, `submitTransactionHash` | Yes |
@@ -233,3 +234,23 @@ pollTransactionStatus(
 ```
 
 Calls `getTransactionStatus` every `intervalMs` (default 2000) until the status is `completed`, `failed`, `expired`, `underpaid`, `overpaid` or `refunded`. After `maxAttempts` (default 150) it rejects with code `UNKNOWN`. A timeout does not mean the payment failed.
+
+## Pay from another asset
+
+Requires 0.1.29 or later. See [Pay from any chain](/guides/pay-from-any-chain/).
+
+```ts
+getCrossChainOptions(params: CrossChainPriceParams | { quote: QuoteResult }): Promise<{ quote: QuoteResult; options: CrossChainOption[] }>
+checkoutFromAnotherAsset(params: CrossChainCheckoutParams): Promise<CrossChainCheckoutResult>
+payFromAnotherAsset(params: { quoteId; originAsset; refundAddress }): Promise<PaymentRoute>
+sendCrossChainDeposit(params: { route; wallet: StellarWalletAdapter; onStatus? }): Promise<{ txHash: string }>
+getPaymentRoute(transactionReference: string): Promise<PaymentRoute>
+pollPaymentRoute(transactionReference: string, options?: { onRoute?; intervalMs?; timeoutMs? }): Promise<PaymentRoute>
+submitCrossChainDeposit(transactionReference: string, txHash: string): Promise<boolean>
+```
+
+`checkoutFromAnotherAsset()` takes a `quote` (or `amount`, `token`, `network`), the `originAsset` (`"XLM"` or `"BTC"`), and either a Stellar `wallet` or a `refundAddress`. It calls `onDeposit(route)` with the deposit details, `onStatus(title, detail)` as the payment moves, and resolves like `checkout()` with an extra `route`.
+
+A `PaymentRoute` has `status` (`quoted`, `deposit_seen`, `processing`, `incomplete`, `delivered`, `settled`, `refunded`, `failed`, `expired`), `transactionStatus`, `depositAddress`, `depositMemo`, `amountInFormatted`, `originTransactions`, `destinationTransaction`, `deadline` and refund details.
+
+Errors: `CROSS_CHAIN_UNAVAILABLE`, `AMOUNT_BELOW_MINIMUM`, `INVALID_REFUND_ADDRESS`, `QUOTE_EXPIRED`, `INSUFFICIENT_BALANCE` and `WALLET_REJECTED`.

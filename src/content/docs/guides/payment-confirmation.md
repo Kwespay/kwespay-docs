@@ -2,7 +2,7 @@
 title: Payment confirmation
 description: Decide whether an order is paid with one verifyPayment call that checks on-chain confirmation, the order, the amount and the currency for you.
 sidebar:
-  order: 4
+  order: 5
 ---
 
 Before you ship goods, grant access or mark an invoice paid, confirm the payment on your server. There are two ways, and most integrations use both:

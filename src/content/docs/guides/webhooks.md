@@ -2,7 +2,7 @@
 title: Webhooks
 description: Receive signed server-to-server notifications when a KwesPay payment succeeds, falls short, fails, expires or is refunded, without a redirect or an open checkout page.
 sidebar:
-  order: 5
+  order: 6
 ---
 
 KwesPay calls an HTTPS endpoint on your server whenever a payment reaches a final state. The customer can close the page as soon as their wallet confirms, and your server still learns the outcome.

@@ -25,6 +25,8 @@ Every integration uses the same API, signed terms and contracts. They differ onl
 
 **Use the GraphQL API** from a server language without an SDK. See the [API reference](/api/).
 
+Every option above can also take [payments from other chains](/guides/pay-from-any-chain/): customers pay with XLM or BTC and the merchant receives USDC on Base.
+
 ## Confirming payments
 
 Whichever option you pick, fulfil orders from your server: receive signed [webhooks](/guides/webhooks/), or call [`verifyPayment`](/guides/payment-confirmation/), which checks the on-chain status, the order, the amount and the currency for you. Nothing redirects the customer away from your page.
