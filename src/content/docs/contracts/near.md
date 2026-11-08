@@ -34,7 +34,7 @@ The sender is `intents.near`, so the terms must be signed with `customer` set to
 
 These cases run in the contract's integration tests against the deployed `intents.near` code in a NEAR sandbox. `intents.near` exists only on mainnet and this contract is deployed only on testnet, so they are not exercised on a live network.
 
-[Hosted cross-chain checkout](/guides/pay-from-any-chain/) doesn't use this path today. It delivers USDC directly to the merchant on Base, and KwesPay verifies that transfer before marking the payment complete.
+[Hosted cross-chain checkout](/guides/pay-from-any-chain/) doesn't use this path today. It delivers directly to the merchant's wallet, and KwesPay verifies that transfer before marking the payment complete.
 
 ## Authorization message
 

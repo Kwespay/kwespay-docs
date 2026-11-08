@@ -249,7 +249,7 @@ pollPaymentRoute(transactionReference: string, options?: { onRoute?; intervalMs?
 submitCrossChainDeposit(transactionReference: string, txHash: string): Promise<boolean>
 ```
 
-`checkoutFromAnotherAsset()` takes a `quote` (or `amount`, `token`, `network`), the `originAsset` (`"XLM"` or `"BTC"`), and either a Stellar `wallet` or a `refundAddress`. It calls `onDeposit(route)` with the deposit details, `onStatus(title, detail)` as the payment moves, and resolves like `checkout()` with an extra `route`.
+`checkoutFromAnotherAsset()` takes a `quote` (or `amount`, `token`, `network`), the `originAsset` from `getCrossChainOptions()`, and either a supported `wallet` or a `refundAddress`. It calls `onDeposit(route)` with the deposit details, `onStatus(title, detail)` as the payment moves, and resolves like `checkout()` with an extra `route`.
 
 A `PaymentRoute` has `status` (`quoted`, `deposit_seen`, `processing`, `incomplete`, `delivered`, `settled`, `refunded`, `failed`, `expired`), `transactionStatus`, `depositAddress`, `depositMemo`, `amountInFormatted`, `originTransactions`, `destinationTransaction`, `deadline` and refund details.
 

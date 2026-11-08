@@ -25,7 +25,7 @@ Every integration uses the same API, signed terms and contracts. They differ onl
 
 **Use the GraphQL API** from a server language without an SDK. See the [API reference](/api/).
 
-Every option above can also take [payments from other chains](/guides/pay-from-any-chain/): customers pay with XLM or BTC and the merchant receives USDC on Base.
+Every option above can also take [payments from other chains](/guides/pay-from-any-chain/): customers pay with any token NEAR Intents supports and the merchant receives the asset they accept.
 
 ## Confirming payments
 

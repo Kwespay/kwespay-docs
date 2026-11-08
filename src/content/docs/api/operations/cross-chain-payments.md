@@ -1,15 +1,15 @@
 ---
 title: Cross-chain payments
-description: The GraphQL operations behind paying with XLM or BTC through NEAR Intents, used to price a route, create a deposit and follow it to settlement.
+description: The GraphQL operations behind paying with any token NEAR Intents supports, used to price a route, create a deposit and follow it to settlement.
 sidebar:
   order: 9
 ---
 
-These operations let a customer pay a USDC on Base invoice with XLM or BTC. [NEAR Intents](https://near-intents.org) converts the deposit and delivers USDC to the merchant. See [Pay from any chain](/guides/pay-from-any-chain/) for the full picture.
+These operations let a customer pay an invoice with any token [NEAR Intents](https://near-intents.org) supports. NEAR Intents converts the deposit and delivers the asset the merchant accepts. See [Pay from any chain](/guides/pay-from-any-chain/) for the full picture.
 
 | Operation | Type | Auth | Purpose | Limit |
 | --- | --- | --- | --- | --- |
-| `crossChainOptions(quoteId)` | Query | `X-API-Key` header | Live price, time estimate and minimum for each asset | 30/min per IP |
+| `crossChainOptions(quoteId)` | Query | `X-API-Key` header | Live price, time estimate and minimum for each token | 30/min per IP |
 | `createCrossChainPayment(input)` | Mutation | `X-API-Key` header | Create the payment and its deposit address | 12/min per IP |
 | `submitCrossChainDeposit(transactionReference, txHash)` | Mutation | `X-API-Key` header | Optional hint that a deposit was sent | API limit |
 | `paymentRoute(transactionReference)` | Query | None | Read the route's current state | API limit |
@@ -18,8 +18,8 @@ The SDK wraps all four in [`checkoutFromAnotherAsset()`](/sdk/methods/#pay-from-
 
 ## Flow
 
-1. Check that `crossChainNetworks` from [`getVendor`](/api/operations/get-vendor/) includes `base`.
-2. Call [`createQuote`](/api/operations/create-quote/) with `network: "base"` and `token: "USDC"`.
+1. Check that `crossChainNetworks` from [`getVendor`](/api/operations/get-vendor/) includes the merchant's network.
+2. Call [`createQuote`](/api/operations/create-quote/) for the merchant's network and token.
 3. Call `crossChainOptions` and show the options where `available` is `true`.
 4. Call `createCrossChainPayment` and show the customer the deposit details.
 5. Poll `paymentRoute` until `status` is `settled`, `refunded`, `failed` or `expired`.
@@ -35,9 +35,9 @@ query CrossChainOptions($quoteId: Int!) {
 
 | Field | Type | Description |
 | --- | --- | --- |
-| `originAsset` | `String!` | `XLM` or `BTC` |
+| `originAsset` | `String!` | Token key, passed to `createCrossChainPayment` |
 | `name` | `String!` | Asset name |
-| `chain` | `String!` | `stellar` or `btc` |
+| `chain` | `String!` | Chain the customer pays from |
 | `chainName` | `String!` | Chain display name |
 | `decimals` | `Int!` | Decimals of the asset |
 | `available` | `Boolean!` | The asset can pay this quote |
@@ -67,7 +67,7 @@ mutation CreateCrossChainPayment($input: CreateCrossChainPaymentInput!) {
 | Input | Type | Description |
 | --- | --- | --- |
 | `quoteId` | `Int!` | From `createQuote` |
-| `originAsset` | `String!` | `XLM` or `BTC` |
+| `originAsset` | `String!` | A token key from `crossChainOptions` |
 | `refundAddress` | `String!` | The customer's address on the origin chain |
 
 Check `success` before reading `route`. When it is `false`, `message` explains why and `code` identifies the failure.
@@ -104,15 +104,15 @@ query PaymentRoute($transactionReference: String!) {
 | `depositAddress` | `String!` | Where to send it |
 | `depositMemo` | `String` | Required when present |
 | `amountIn`, `amountInFormatted` | `String!` | Amount to send, in base units and whole units |
-| `amountOut` | `String!` | USDC delivered, in base units |
-| `network`, `token` | `String!` | `base` and `USDC` |
+| `amountOut` | `String!` | Amount delivered to the merchant, in base units |
+| `network`, `token` | `String!` | What the merchant receives |
 | `recipient` | `String!` | The merchant's wallet |
 | `refundAddress` | `String!` | Where a refund goes |
-| `deadline` | `DateTime!` | Send before this time. 30 minutes for XLM, 60 for BTC |
+| `deadline` | `DateTime!` | Send before this time. The window depends on the token |
 | `fundableUntil` | `DateTime!` | The last moment a late deposit can still be converted |
 | `timeEstimateSeconds` | `Int` | Estimated conversion time |
 | `originTransactions` | `[CrossChainTx!]!` | Deposits, each with `hash` and `explorerUrl` |
-| `destinationTransaction` | `CrossChainTx` | The USDC delivery to the merchant |
+| `destinationTransaction` | `CrossChainTx` | The delivery to the merchant |
 | `refundedAmount`, `refundReason` | `String` | Set when refunded |
 | `paidLate` | `Boolean!` | The deposit arrived after `deadline` and still completed |
 
@@ -122,8 +122,8 @@ query PaymentRoute($transactionReference: String!) {
 | `deposit_seen` | The deposit was detected |
 | `processing` | The conversion is running |
 | `incomplete` | Less than the required amount arrived |
-| `delivered` | Delivery reported. KwesPay is verifying it on Base |
-| `settled` | KwesPay verified the USDC on Base. Final |
+| `delivered` | Delivery reported. KwesPay is verifying it on-chain |
+| `settled` | KwesPay verified the delivery on-chain. Final |
 | `refunded` | Returned to `refundAddress`. Final |
 | `failed` | The conversion failed. Final |
 | `expired` | No deposit arrived in time. Final |

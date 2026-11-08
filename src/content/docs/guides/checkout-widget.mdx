@@ -102,14 +102,14 @@ All three set `window.KwesPay` with `kwespay`, `KwesPayWidget` and `attemptMobil
 
 ## Pay from any chain
 
-Requires `@kwespay/widget` 1.2.0 or later. When a merchant accepts payments from other assets, the network list shows **Pay with XLM or BTC**. Your page needs no extra code or options.
+Requires `@kwespay/widget` 1.2.0 or later. When a merchant turns on payments from other chains, customers can pay with any token [NEAR Intents](https://near-intents.org) supports. Your page needs no extra code or options.
 
-1. The customer picks XLM or BTC and sees the live price.
-2. With XLM they can connect a Stellar wallet and approve one payment. Otherwise they enter a refund address and send to the deposit address, memo and QR code shown.
-3. [NEAR Intents](https://near-intents.org) converts the payment and delivers USDC to the merchant on Base.
+1. The customer picks a token and sees the live price.
+2. They connect a supported wallet and approve one payment, or enter a refund address and send to the deposit address and QR code shown.
+3. NEAR Intents converts the payment and delivers the asset the merchant accepts.
 4. KwesPay verifies the delivery on-chain, and the widget shows the receipt.
 
-The result has `network: "base"`, `token: "USDC"` and `paidWith`, and `transactionHash` is the delivery on Base. Confirm the order on your server with `verifyPayment` as usual. See [Pay from any chain](/guides/pay-from-any-chain/).
+In the result, `network` and `token` are what the merchant received, `paidWith` is what the customer sent, and `transactionHash` is the delivery to the merchant. Confirm the order on your server with `verifyPayment` as usual. See [Pay from any chain](/guides/pay-from-any-chain/).
 
 ## Options
 
