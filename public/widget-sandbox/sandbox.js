@@ -4,6 +4,9 @@
 	const ZERO = '0x0000000000000000000000000000000000000000';
 	const ACCOUNT = '0x7e57000000000000000000000000000000000001';
 	const API_HOST = 'kwespay.xyz';
+	const NEAR_RPC = 'https://rpc.testnet.near.org';
+	const NEAR_ACCOUNT = 'kwespay-test-wallet.testnet';
+	const NEAR_NATIVE = 'NEAR';
 
 	const NETWORKS = {
 		ethereum: { chainId: 1, name: 'Ethereum' },
@@ -18,6 +21,7 @@
 		arbitrumSepolia: { chainId: 421614, name: 'Arbitrum Sepolia' },
 		liskTestnet: { chainId: 4202, name: 'Lisk Sepolia' },
 		mezoTestnet: { chainId: 31611, name: 'Mezo Testnet' },
+		nearTestnet: { chainId: null, name: 'NEAR Testnet' },
 	};
 
 	const TOKENS = {
@@ -33,20 +37,23 @@
 		arbitrumSepolia: { ETH: [ZERO, 18], USDC: ['0x75faf114eafb1BDbe2F0316DF893fd58CE46AA4d', 6], ARB: ['0x15dd68a7a37d7edBf284b93Bc25d6b286d33fCc3', 18] },
 		liskTestnet: { ETH: [ZERO, 18], LSK: ['0x8a21CF9Ba08Ae709D64Cb25AfAA951183EC9FF6D', 18] },
 		mezoTestnet: { MEZO: ['0x7B7c000000000000000000000000000000000001', 18], USDT: ['0xd16c9c341Bc15B5db7E25881893CA5a3117bB9A5', 6] },
+		nearTestnet: { NEAR: [NEAR_NATIVE, 24], USDC: ['3e2210e1184b45b64c8a434c0a7e7b23cc04ea7eb7a6c3c32520d03d4afcb8af', 6], 'USDC.E': ['usdc.fakes.testnet', 6], USDT: ['usdt.fakes.testnet', 6] },
 	};
 
 	const CONTRACTS = {
-		sepolia: '0xD9312df771aEf74a6748c0C46A706873C67F44C7',
+		sepolia: '0xEC2f1C7138921C28802A7Bd2b7098D99B3330b33',
 		baseSepolia: '0x3d7A6a7aD72374D2d3dca4e97053bAbFA6E49ec0',
 		polygonAmoy: '0xEb40935599d5D8ef39C1aAE38E7A1f6d9c89B3fF',
-		arbitrumSepolia: '0xa430B2e0D1273464809f8541286058e90781DA9C',
+		arbitrumSepolia: '0xf141a81298E0890E8b347f505BfA028a14253030',
 		liskTestnet: '0x3378B6074A9DA47Aef8b7C849aFcaF58b8D8134b',
 		mezoTestnet: '0x67f3Df6B5BE714303F397104d8F2A3861b9E8b6d',
+		nearTestnet: 'pay.kwespay.testnet',
 	};
 
 	const IMG = 'https://arthuremma2.github.io/img-hosting/';
 	const USDC_LOGO = 'https://move-flow.github.io/assets/usd-coin-usdc-logo.svg';
 	const USDT_LOGO = 'https://move-flow.github.io/assets/tether-usdt-logo.svg';
+	const NEAR_LOGO = 'https://assets.coingecko.com/coins/images/10365/large/near.jpg';
 	const NETWORK_LOGOS = {
 		ethereum: IMG + 'ethereum-eth.svg',
 		sepolia: IMG + 'ethereum-eth.svg',
@@ -60,6 +67,7 @@
 		mezoTestnet: IMG + 'mezo.png',
 		arbitrum: IMG + 'arb44.svg',
 		arbitrumSepolia: IMG + 'arb44.svg',
+		nearTestnet: NEAR_LOGO,
 	};
 	const TOKEN_LOGOS = {
 		ETH: IMG + 'ethereum-eth.svg',
@@ -68,15 +76,19 @@
 		USDT: USDT_LOGO,
 		USDC: USDC_LOGO,
 		USDBC: USDC_LOGO,
+		'USDC.E': USDC_LOGO,
+		NEAR: NEAR_LOGO,
 		MUSD: IMG + 'MUSD.png',
 		MEZO: IMG + 'mezo.png',
 		LSK: IMG + 'liskt.png',
 		ARB: IMG + 'arb44.svg',
 	};
 
-	const USD_PRICE = { DAI: 1, USDBC: 1, ETH: 3000, MATIC: 0.5, ARB: 0.5, LSK: 1, MEZO: 1, MUSD: 1, USDC: 1, USDT: 1 };
+	const USD_PRICE = { NEAR: 3.5, 'USDC.E': 1, DAI: 1, USDBC: 1, ETH: 3000, MATIC: 0.5, ARB: 0.5, LSK: 1, MEZO: 1, MUSD: 1, USDC: 1, USDT: 1 };
 	const USD_PER_FIAT = { USD: 1, GHS: 1 / 15 };
 	const FEE_BPS = 50n;
+	const feeBps = (network) => (network === 'nearTestnet' ? 100n : FEE_BPS);
+	const isNear = (network) => network === 'nearTestnet';
 
 	const quotes = new Map();
 	const transactions = new Map();
@@ -114,24 +126,24 @@
 					key,
 					name: NETWORKS[key].name,
 					environment: 'testnet',
-					ecosystem: 'evm',
+					ecosystem: isNear(key) ? 'near' : 'evm',
 					chainId: NETWORKS[key].chainId,
 					contractAddress: CONTRACTS[key],
 					registryObjectId: null,
-					platformFeeBps: Number(FEE_BPS),
-					explorerTxUrl: null,
-					publicRpcUrl: null,
-					nativeSymbol: key === 'polygonAmoy' ? 'MATIC' : key === 'mezoTestnet' ? 'BTC' : 'ETH',
+					platformFeeBps: Number(feeBps(key)),
+					explorerTxUrl: isNear(key) ? 'https://testnet.nearblocks.io/txns/' : null,
+					publicRpcUrl: isNear(key) ? NEAR_RPC : null,
+					nativeSymbol: isNear(key) ? 'NEAR' : key === 'polygonAmoy' ? 'MATIC' : key === 'mezoTestnet' ? 'BTC' : 'ETH',
 					networkPassphrase: null,
 					logoUrl: NETWORK_LOGOS[key] ?? null,
 					tokens: Object.entries(TOKENS[key]).map(([symbol, [address, decimals]]) => ({
 						symbol,
-						displaySymbol: symbol,
+						displaySymbol: symbol === 'USDC.E' ? 'USDC.e' : symbol,
 						name: symbol,
 						logoUrl: TOKEN_LOGOS[symbol] ?? null,
 						address,
 						decimals,
-						isNative: address === ZERO,
+						isNative: address === ZERO || address === NEAR_NATIVE,
 					})),
 				})),
 			};
@@ -142,11 +154,13 @@
 					vendorPk: 1,
 					vendorIdentifier,
 					businessName: 'Example Store',
-					acceptedCurrencies: ['ETH', 'MATIC', 'USDC', 'USDT', 'ARB', 'LSK', 'MUSD', 'BTC', 'MEZO'],
+					acceptedCurrencies: ['ETH', 'MATIC', 'USDC', 'USDC.E', 'USDT', 'ARB', 'LSK', 'MUSD', 'BTC', 'MEZO', 'NEAR'],
 					enabledNetworks: Object.keys(CONTRACTS),
 					hasEvmWallet: true,
 					hasSuiWallet: false,
 					hasStellarWallet: false,
+					hasNearWallet: true,
+					crossChainNetworks: [],
 					activeStatus: true,
 				},
 			};
@@ -190,7 +204,7 @@
 			}
 			const human = (input.fiatAmount * fx) / price;
 			const amount = BigInt(Math.round(human * 1e6)) * 10n ** BigInt(t.decimals - 6);
-			const total = amount + (amount * FEE_BPS) / 10000n;
+			const total = amount + (amount * feeBps(input.network)) / 10000n;
 			const quoteId = 1000 + quotes.size + 1;
 			const quote = {
 				success: true,
@@ -230,7 +244,9 @@
 					success: true,
 					message: 'Transaction ready. Sign in wallet.',
 					paymentIdBytes32: hex(32),
-					backendSignature: hex(65),
+					backendSignature: hex(isNear(q.network) ? 64 : 65),
+					vendorIdentifier: 'YOUR_VENDOR_ID',
+					vendorWallet: isNear(q.network) ? 'example-store.testnet' : null,
 					tokenAddress: q.tokenAddress,
 					amountBaseUnits: q.amountBaseUnits,
 					totalBaseUnits: q.totalBaseUnits,
@@ -275,6 +291,7 @@
 		if (/walletconnect|reown|web3modal/i.test(url)) {
 			throw new TypeError('WalletConnect is not available in this simulation. Use the KwesPay Test Wallet.');
 		}
+		if (url === NEAR_RPC) return nearRpc(JSON.parse(init.body || '{}'));
 		if (!url.includes(API_HOST) || !url.endsWith('/graphql')) return realFetch(resource, init);
 		const body = JSON.parse(init.body || '{}');
 		const op = Object.keys(graphql).find((name) => new RegExp(`\\b${name}\\b\\s*[({]`).test(body.query));
@@ -288,6 +305,18 @@
 		post('api', op || 'unknown', { variables: body.variables, response: payload });
 		return new Response(JSON.stringify(payload), { status: 200, headers: { 'Content-Type': 'application/json' } });
 	};
+
+	function nearRpc({ id, params = {} }) {
+		const funded = scenario !== 'insufficient';
+		let result;
+		if (params.request_type === 'view_account') {
+			result = { amount: funded ? (10n ** 26n).toString() : '0', storage_usage: 0 };
+		} else {
+			const text = JSON.stringify(funded ? (10n ** 30n).toString() : '0');
+			result = { result: Array.from(new TextEncoder().encode(text)) };
+		}
+		return new Response(JSON.stringify({ jsonrpc: '2.0', id, result }), { status: 200, headers: { 'Content-Type': 'application/json' } });
+	}
 
 	const RealWebSocket = window.WebSocket;
 	window.WebSocket = function (url, protocols) {
@@ -331,6 +360,37 @@
 			rejectBtn.onclick = () => done(false);
 		});
 	}
+
+	const nearWallet = {
+		async getAccounts() {
+			if (!wallet.nearConnected) {
+				await ask('Connect to this site?', [
+					['Site', location.host],
+					['Account', NEAR_ACCOUNT],
+				]);
+				wallet.nearConnected = true;
+			}
+			return [{ accountId: NEAR_ACCOUNT }];
+		},
+		async signAndSendTransaction({ receiverId, actions }) {
+			const q = current?.quote;
+			await ask('Confirm payment', [
+				['Pay', q ? `${formatUnits(q.totalBaseUnits, q.decimals)} ${q.cryptoCurrency}` : 'Unknown'],
+				['To', `KwesPay contract ${CONTRACTS.nearTestnet}`],
+				['Method', actions[0]?.params?.methodName ?? 'Unknown'],
+				['Network', NETWORKS.nearTestnet.name],
+			]);
+			const hash = hex(32).slice(2);
+			if (current) current.hash = hash;
+			post('wallet', 'signAndSendTransaction', { receiverId, actions });
+			return {
+				status: { SuccessValue: btoa(JSON.stringify(q?.totalBaseUnits ?? '0')) },
+				transaction: { hash },
+				transaction_outcome: { id: hash },
+				receipts_outcome: [],
+			};
+		},
+	};
 
 	const networkName = (chainId) => Object.values(NETWORKS).find((n) => n.chainId === chainId)?.name ?? `Chain ${chainId}`;
 	const short = (a) => `${a.slice(0, 8)}…${a.slice(-6)}`;
@@ -485,5 +545,5 @@
 		window.addEventListener(`kwespay:${name}`, (e) => post('event', `kwespay:${name}`, e.detail ?? {}));
 	}
 
-	window.__kwespaySandbox = { post, scenario };
+	window.__kwespaySandbox = { post, scenario, nearWallet };
 })();

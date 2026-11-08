@@ -3,7 +3,7 @@
 	const amount = Number(params.get('amount')) > 0 ? Number(params.get('amount')) : 120;
 	const currency = params.get('currency') === 'USD' ? 'USD' : 'GHS';
 	const tokens = params.get('tokens') === 'stablecoins' ? 'stablecoins' : undefined;
-	const { post } = window.__kwespaySandbox;
+	const { post, nearWallet } = window.__kwespaySandbox;
 
 	const symbol = currency === 'GHS' ? 'GH₵' : '$';
 	document.querySelector('[data-order-total]').textContent = `${symbol}${amount.toFixed(2)} ${currency}`;
@@ -18,7 +18,7 @@
 		if (tokens) config.acceptedTokens = tokens;
 		post('code', 'kwespay(config)', config);
 		try {
-			const payment = await window.KwesPay.kwespay(config);
+			const payment = await window.KwesPay.kwespay({ ...config, nearWallet });
 			post('result', 'Promise resolved', payment);
 			result.textContent = `Widget resolved with transactionStatus "${payment.transactionStatus}". Your server would now call verifyPayment("${payment.transactionReference}", { orderId: "1042", amount: ${amount}, currency: "${currency}" }).`;
 		} catch (err) {
