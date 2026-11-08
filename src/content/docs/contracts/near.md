@@ -20,6 +20,22 @@ The NEAR contract is written in Rust with `near-sdk`. It is deployed on testnet 
 
 `amount` is the merchant amount in base units. The SDK's [`pay()`](/sdk/methods/#pay) builds both calls for you.
 
+## Delivery through NEAR Intents
+
+The contract also accepts tokens delivered by `intents.near`, using the same code as a wallet payment. Intents calls `ft_withdraw` with `receiver_id` set to the KwesPay contract and `msg` set to the signed terms. The token then calls `ft_on_transfer`, and the contract applies the usual signature check, fee and `payment_completed` event.
+
+The sender is `intents.near`, so the terms must be signed with `customer` set to `intents.near`.
+
+| Delivery | Result |
+| --- | --- |
+| Valid | The merchant receives the amount and KwesPay the fee. The payment is recorded with `customer = intents.near` |
+| Expired, wrong customer, underpaid or already paid | The full amount returns to the sender's Intents balance. Merchant and fee are untouched |
+| Overpaid | The merchant is paid exactly and only the excess returns |
+
+These cases run in the contract's integration tests against the deployed `intents.near` code in a NEAR sandbox. `intents.near` exists only on mainnet and this contract is deployed only on testnet, so they are not exercised on a live network.
+
+[Hosted cross-chain checkout](/guides/pay-from-any-chain/) doesn't use this path today. It delivers USDC directly to the merchant on Base, and KwesPay verifies that transfer before marking the payment complete.
+
 ## Authorization message
 
 `signature = Ed25519(backend_key, SHA-256(message))`. Variable-length fields are a big-endian `u16` length followed by UTF-8 bytes.

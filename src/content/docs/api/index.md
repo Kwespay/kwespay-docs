@@ -41,6 +41,7 @@ These are the operations a payment integration uses. The dashboard uses further 
 | [`validateAccessKey`](/api/operations/validate-access-key/) | Query | None | Check an API key and its scope |
 | [`getVendor`](/api/operations/get-vendor/) | Query | None | Read a merchant's public payment configuration |
 | [Payment link operations](/api/operations/payment-link-checkout/) | Query, Mutation | None | Read, price and pay a payment link |
+| [Cross-chain operations](/api/operations/cross-chain-payments/) | Query, Mutation | API key, except `paymentRoute` | Pay a USDC on Base invoice with XLM or BTC |
 
 ## Response conventions
 

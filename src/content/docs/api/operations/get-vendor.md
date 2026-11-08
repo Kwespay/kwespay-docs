@@ -31,6 +31,7 @@ Returns the merchant's payment configuration, or `null` if the vendor ID does no
 | `hasSuiWallet` | `Boolean!` | A Sui receiving wallet is set |
 | `hasStellarWallet` | `Boolean!` | A Stellar receiving wallet is set |
 | `activeStatus` | `Boolean!` | The merchant can accept payments |
+| `crossChainNetworks` | `[String!]!` | Networks that can receive [payments from other assets](/api/operations/cross-chain-payments/) |
 
 A network is usable only when it is enabled, the merchant has a wallet of its family, and at least one accepted token is offered on it. `getMerchantConfig()` in the SDK computes this for you.
 
